@@ -16,7 +16,7 @@ def readData(input_path,split_type,cpc_code):
     
     
 
-    for file_name in file_names :
+    for file_name in file_names[:6] :
         print(file_name)
     #file_name = file_names[0]
         print("Reading file "+ file_name + " from "+ split_type+" split for cpc code " + cpc_code)
@@ -30,7 +30,13 @@ def readData(input_path,split_type,cpc_code):
                 count_character_abs.append(len(json_obj["abstract"]))
                 count_character_des.append(len(json_obj["description"]))
                 count_word_abs.append( json_obj["abstract"].count(" ") )
-                count_word_des.append( json_obj["description"].count(" ") )
+                count_word_des.append( json_obj["description"].count(" ")
+                                      )
+                for charac in json_obj["description"]:
+                    if charac not in count_character.keys():
+                        count_character[charac]=1
+                    else :
+                        count_character[charac]+=1
                 ###Afin de compter les mots on va compter les espaces dans une 1ère approche
                 
                 
@@ -44,16 +50,23 @@ def readData(input_path,split_type,cpc_code):
                 #print(json_obj["publication_number"])
                 # print(json_obj["abstract"])
                 # print(json_obj["description"])
-            print(json_obj.keys())
+            #print(json_obj.keys())
 count_character_abs=[]
 count_character_des=[]
 count_word_abs=[]
-count_word_des=[]          
+count_word_des=[]
+count_character={}
+       
 readData("data","train","g")
 
      
 sns.boxplot(data=count_character_abs,fliersize=10) 
-sns.boxplot(data=count_character_des,fliersize=10) 
+plt.show()
+sns.boxplot(data=count_character_des,fliersize=10)
+plt.show() 
 sns.boxplot(data=count_word_abs,fliersize=10) 
+plt.show()
 sns.boxplot(data=count_word_des,fliersize=10)   
 plt.show()
+
+print(count_character)
