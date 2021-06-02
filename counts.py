@@ -5,10 +5,11 @@ import sys
 import argparse
 #import panda as pd
 import matplotlib.pyplot as plt
-
+import re
 # Library for boxplots
 import seaborn as sns
-
+import nltk
+from nltk.corpus import stopwords
 def readData(input_path,split_type,cpc_code):
     file_names = os.listdir(os.path.join(input_path,split_type,cpc_code))
     # reading one of the gz files.
@@ -56,17 +57,41 @@ count_character_des=[]
 count_word_abs=[]
 count_word_des=[]
 count_character={}
-       
-readData("data","train","g")
+
+def filterChars(input_path,split_type,cpc_code):
+    file_names = os.listdir(os.path.join(input_path,split_type,cpc_code))
+    # reading one of the gz files.
+    cachedstopwords = stopwords.words("english")
+    for file_name in file_names[:2] :
+        print(file_name)
+    #file_name = file_names[0]
+        print("Reading file "+ file_name + " from "+ split_type+" split for cpc code " + cpc_code)
+        
+        f = open(os.path.join(input_path,split_type,cpc_code,file_name),'r')
+
+        regex = re.compile('[^a-zA-Z ]')
+        content = f.read().lower()
+        new_f= open(os.path.join(input_path,split_type,cpc_code,'new_'+file_name)+'.txt','w+')
+        filtered_content = regex.sub(' ',content)
+        filtered_content2 = re.sub(r'(?:^| )\w(?:$| )', ' ', filtered_content).strip()
+        removedStopwords = ' '.join([word for word in filtered_content2.split() if word not in cachedstopwords])
+        stripped_content=re.sub(' +',' ',removedStopwords)
+
+        new_f.write(stripped_content)
+        print("Wrote file "+new_f.name)
+        f.close()
+        new_f.close()
+        
+filterChars("data","train","g")
 
      
-sns.boxplot(data=count_character_abs,fliersize=10) 
-plt.show()
-sns.boxplot(data=count_character_des,fliersize=10)
-plt.show() 
-sns.boxplot(data=count_word_abs,fliersize=10) 
-plt.show()
-sns.boxplot(data=count_word_des,fliersize=10)   
-plt.show()
-
-print(count_character)
+#sns.boxplot(data=count_character_abs,fliersize=10) 
+#plt.show()
+#sns.boxplot(data=count_character_des,fliersize=10)
+#plt.show() 
+#sns.boxplot(data=count_word_abs,fliersize=10) 
+#plt.show()
+#sns.boxplot(data=count_word_des,fliersize=10)   
+#plt.show()
+#
+#print(count_character)
