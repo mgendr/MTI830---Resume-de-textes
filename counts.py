@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Jun  2 21:59:46 2021
+
+@author: mathi
+"""
+
 import json
 import gzip
 import os
@@ -10,19 +17,28 @@ import re
 import seaborn as sns
 import nltk
 from nltk.corpus import stopwords
-def readData(input_path,split_type,cpc_code):
-    file_names = os.listdir(os.path.join(input_path,split_type,cpc_code))
+
+def readData(path,filename):
+    json_obj_list=[]
+    with open(os.path.join(path,filename),'r') as fin:
+        for row in fin:
+            json_obj_list.append(json.loads(row))
+    return json_obj_list
+
+
+def countData(split_type):
+    file_names = os.listdir(os.path.join("data","train","g"))
     # reading one of the gz files.
 
     
     
 
-    for file_name in file_names[:6] :
+    for file_name in file_names[:1] :
         print(file_name)
     #file_name = file_names[0]
         print("Reading file "+ file_name + " from "+ split_type+" split for cpc code " + cpc_code)
         
-        with open(os.path.join(input_path,split_type,cpc_code,file_name),'r') as fin:
+        with open(os.path.join("data","train","g"),'r') as fin:
             
             for row in fin:
                 #print(row)
@@ -37,10 +53,7 @@ def readData(input_path,split_type,cpc_code):
                     if charac not in count_character.keys():
                         count_character[charac]=1
                     else :
-                        count_character[charac]+=1
-                ###Afin de compter les mots on va compter les espaces dans une 1ère approche
-                
-                
+                        count_character[charac]+=1              
                 
                 
                 
@@ -58,31 +71,41 @@ count_word_abs=[]
 count_word_des=[]
 count_character={}
 
-def filterChars(input_path,split_type,cpc_code):
-    file_names = os.listdir(os.path.join(input_path,split_type,cpc_code))
-    # reading one of the gz files.
+def filterChars(path,filename,JSONlist):
     cachedstopwords = stopwords.words("english")
-    for file_name in file_names[:2] :
-        print(file_name)
-    #file_name = file_names[0]
-        print("Reading file "+ file_name + " from "+ split_type+" split for cpc code " + cpc_code)
-        
-        f = open(os.path.join(input_path,split_type,cpc_code,file_name),'r')
-
-        regex = re.compile('[^a-zA-Z ]')
-        content = f.read().lower()
-        new_f= open(os.path.join(input_path,split_type,cpc_code,'new_'+file_name)+'.txt','w+')
-        filtered_content = regex.sub(' ',content)
-        filtered_content2 = re.sub(r'(?:^| )\w(?:$| )', ' ', filtered_content).strip()
-        removedStopwords = ' '.join([word for word in filtered_content2.split() if word not in cachedstopwords])
-        stripped_content=re.sub(' +',' ',removedStopwords)
-
-        new_f.write(stripped_content)
-        print("Wrote file "+new_f.name)
-        f.close()
-        new_f.close()
-        
-filterChars("data","train","g")
+    if os.path.exists(path+'new_'+filename+'.txt')==True:
+        os.remove(path+'new_'+filename+'.txt')
+    new_f= open(os.path.join(path,'new_'+filename)+'.txt','a')
+    for i in range(len(JSONlist)) :
+        abstract = JSONlist[i]['abstract']
+        description = JSONlist[i]['description']
+            
+        abstract1 = abstract.lower()
+        description1 = description.lower()
+            
+        abstract2 = re.sub('[^a-zA-Z ]',' ',abstract1)
+        description2 = re.sub('[^a-zA-Z ]',' ',description1)
+            
+        abstract3 = re.sub(r'(?:^| )\w(?:$| )', ' ', abstract2).strip()
+        description3 = re.sub(r'(?:^| )\w(?:$| )', ' ', description2).strip()
+            
+        abstract4 = ' '.join([word for word in abstract3.split() if word not in cachedstopwords])
+        description4 = ' '.join([word for word in description3.split() if word not in cachedstopwords])
+            
+        abstract5=re.sub(' +',' ',abstract4)
+        description5=re.sub(' +',' ',description4)
+            
+        JSONlist[i]['abstract']=abstract5
+        JSONlist[i]['description']=description5
+        updatedJSON={"publication_number":JSONlist[i]['publication_number'],"abstract":abstract5,"description":description5}
+        new_f.write(json.dumps(updatedJSON))
+    print("Wrote file "+new_f.name)
+    new_f.close()
+    return JSONlist
+file_names = [file for file in os.listdir(os.path.join("data","train","g")) if ".txt" not in file]
+for file_name in file_names:
+    listJSON = readData(os.path.join("data","train","g"),file_name)
+    JSONlist=filterChars(os.path.join("data","train","g"),file_name,listJSON)
 
      
 #sns.boxplot(data=count_character_abs,fliersize=10) 
