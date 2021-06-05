@@ -16,7 +16,9 @@ import re
 # Library for boxplots
 import seaborn as sns
 import nltk
+
 from nltk.corpus import stopwords
+nltk.download('stopwords')
 
 def readData(path,filename):
     json_obj_list=[]
@@ -102,10 +104,15 @@ def filterChars(path,filename,JSONlist):
     print("Wrote file "+new_f.name)
     new_f.close()
     return JSONlist
-file_names = [file for file in os.listdir(os.path.join("data","train","g")) if ".txt" not in file]
+
+
+# A remplacer par "train"  "val"   "test"
+kind_data="test"
+
+file_names = [file for file in os.listdir(os.path.join("data",kind_data,"g")) if ".txt" not in file]
 for file_name in file_names:
-    listJSON = readData(os.path.join("data","train","g"),file_name)
-    JSONlist=filterChars(os.path.join("data","train","g"),file_name,listJSON)
+    listJSON = readData(os.path.join("data",kind_data,"g"),file_name)
+    JSONlist=filterChars(os.path.join("data",kind_data,"g"),file_name,listJSON)
 
      
 #sns.boxplot(data=count_character_abs,fliersize=10) 
