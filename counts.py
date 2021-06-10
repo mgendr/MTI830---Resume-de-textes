@@ -105,16 +105,29 @@ def filterChars(path,filename,JSONlist):
     new_f.close()
     return JSONlist
 
-
+def addLineReturn(path,filename):
+    f=open(os.path.join(path,file_name2),'r')
+    text = f.read().replace('}{"publication_number"','}\n{"publication_number"').encode("utf8")
+    f.close()
+    f2=open(os.path.join(os.path.join("data",kind_data,"g"),file_name2),'wb')
+    f2.write(text)
+    f2.close()
+    print("Updated file "+f2.name)
 # A remplacer par "train"  "val"   "test"
-kind_data="test"
+kind_data="train"
 
-file_names = [file for file in os.listdir(os.path.join("data",kind_data,"g")) if ".txt" not in file]
-for file_name in file_names:
-    listJSON = readData(os.path.join("data",kind_data,"g"),file_name)
-    JSONlist=filterChars(os.path.join("data",kind_data,"g"),file_name,listJSON)
+#file_names = [file for file in os.listdir(os.path.join("data",kind_data,"g")) if ".txt" not in file]
+#for file_name in file_names[:1]:
+#    listJSON = readData(os.path.join("data",kind_data,"g"),file_name)
+#    JSONlist=filterChars(os.path.join("data",kind_data,"g"),file_name,listJSON)
 
-     
+#f=open(os.path.join(os.path.join("data",kind_data,"g"),'data000000000000'),'r',encoding="utf8")
+#text =f.read()
+#print(text)
+
+file_names2 = [file for file in os.listdir(os.path.join("data",kind_data,"g")) if file.endswith('.txt')] 
+for file_name2 in file_names2:
+    addLineReturn(os.path.join("data",kind_data,"g"),file_name2)
 #sns.boxplot(data=count_character_abs,fliersize=10) 
 #plt.show()
 #sns.boxplot(data=count_character_des,fliersize=10)
