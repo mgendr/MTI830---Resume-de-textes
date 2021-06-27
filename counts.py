@@ -17,8 +17,6 @@ import re
 import seaborn as sns
 import nltk
 
-from nltk.corpus import stopwords
-nltk.download('stopwords')
 
 def readData(path,filename):
     json_obj_list=[]
@@ -29,14 +27,14 @@ def readData(path,filename):
 
 
 def countData():
-    file_names = os.listdir(os.path.join("data","train","g"))
+    file_names = [file for file in os.listdir(os.path.join("data",kind_data,"g")) if ".txt" not in file]
     # reading one of the gz files.
     for file_name in file_names :
         #print(file_name)
     
-        print("Reading file "+ file_name + " from "+ "train"+" split for cpc code " + cpc_code)
+        print("Reading file "+ file_name + " from "+ "train"+" split for cpc code " + "g")
         
-        with open(os.path.join("data","train","g"),'r') as fin:
+        with open(os.path.join("data","train","g",file_name),'r') as fin:
             
             for row in fin:
                 #print(row)
@@ -73,3 +71,6 @@ sns.boxplot(data=count_word_des,fliersize=10)
 plt.show()
 
 print(count_character)
+print(len(count_character.keys()))
+print(np.percentile(count_word_abs, 75))
+print(np.mean(count_word_abs))
