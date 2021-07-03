@@ -1,6 +1,10 @@
 data/
 data_token/
 
+noOutliers/
+
+stemmed/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
